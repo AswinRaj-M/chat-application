@@ -1,10 +1,14 @@
 import React, { createContext, useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
+
+const SocketContext = createContext();
+
 const socketUrl = import.meta.env.VITE_API_URL;
 console.log("Socket URL:", socketUrl || "UNDEFINED - defaulting to window.location");
 const socket = io(socketUrl);
 
+console.log(socketUrl)
 const ContextProvider = ({ children }) => {
     const [me, setMe] = useState('');
     const [user, setUser] = useState(() => {
