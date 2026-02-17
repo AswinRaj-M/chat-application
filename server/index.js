@@ -55,7 +55,7 @@ app.use('/api/messages', async (req, res) => {
 });
 
 app.use(cors({
-    origin: "chat-application-h8njrli6t-aswin-raj-s-projects.vercel.app",
+    origin: "*",
     credentials: true
 }));
 
