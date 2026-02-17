@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
+import.meta.env.VITE_API_URL
 
 const Login = () => {
     const { loginUser, user } = useContext(SocketContext);

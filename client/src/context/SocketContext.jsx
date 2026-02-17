@@ -1,6 +1,7 @@
 import React, { createContext, useState, useRef, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
+import.meta.env.VITE_API_URL
 
 const SocketContext = createContext();
 
