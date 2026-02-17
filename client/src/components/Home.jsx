@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
+import CallHistory from './CallHistory';
 
 const Home = () => {
     const {
@@ -12,6 +13,7 @@ const Home = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
+    const [view, setView] = useState('chat'); // 'chat' or 'history'
     const navigate = useNavigate();
     const scrollRef = useRef();
 

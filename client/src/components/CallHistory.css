@@ -1,0 +1,78 @@
+.call-history-container {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+    background: #f9f9f9;
+}
+
+.call-list {
+    list-style: none;
+    padding: 0;
+}
+
+.call-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.call-item.missed {
+    border-left: 4px solid #ff4444;
+}
+
+.call-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.call-icon {
+    font-size: 1.2rem;
+}
+
+.call-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.call-type {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.call-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.status {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.status.missed,
+.status.rejected {
+    color: #d32f2f;
+    background: #ffebee;
+}
+
+.status.accepted,
+.status.ended {
+    color: #388e3c;
+    background: #e8f5e9;
+}
+
+.duration {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #333;
+}

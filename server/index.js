@@ -7,6 +7,8 @@ const socketIo = require('socket.io');
 const authRoutes = require('./routes/auth');
 const User = require('./models/User');
 const Message = require('./models/Message');
+const Call = require('./models/Call');
+const callRoutes = require('./routes/calls');
 
 dotenv.config();
 
@@ -64,11 +66,14 @@ app.use('/api/messages', async (req, res) => {
     }
 });
 
+app.use('/api/calls', callRoutes);
+
 
 
 
 // Socket.IO Logic
 let users = {}; // userId -> socketId
+let calls = {}; // socketId -> callId
 
 io.on('connection', (socket) => {
     console.log(`Socket connected: ${socket.id}`);
@@ -97,31 +102,69 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('call-user', (data) => {
+    socket.on('call-user', async (data) => {
         const { userToCall, signalData, from, name, callType } = data;
         const receiverSocketId = users[userToCall];
-        if (receiverSocketId) {
-            io.to(receiverSocketId).emit('incoming-call', {
-                signal: signalData,
-                from,
-                name,
-                callType // Pass call type (audio/video)
+
+        try {
+            const newCall = new Call({
+                callerId: from,
+                receiverId: userToCall,
+                status: 'initiated'
             });
+            await newCall.save();
+
+            calls[socket.id] = newCall._id;
+            if (receiverSocketId) calls[receiverSocketId] = newCall._id;
+
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('incoming-call', {
+                    signal: signalData,
+                    from,
+                    name,
+                    callType,
+                    callId: newCall._id
+                });
+            } else {
+                newCall.status = 'missed';
+                await newCall.save();
+            }
+        } catch (err) {
+            console.error("Error logging call:", err);
         }
     });
 
-    socket.on('answer-call', (data) => {
-        // data.to might be a Socket ID (from receiver) or User ID. 
-        // Try lookup, otherwise assume it's already a socket ID.
+    socket.on('answer-call', async (data) => {
         const receiverSocketId = users[data.to] || data.to;
+
+        const callId = data.callId || calls[socket.id];
+        if (callId) {
+            await Call.findByIdAndUpdate(callId, { status: 'accepted', startTime: Date.now() });
+        }
+
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('call-accepted', { signal: data.signal, name: data.name });
         }
     });
 
-    socket.on('end-call', (data) => {
+    socket.on('end-call', async (data) => {
         const { to } = data;
         const receiverSocketId = users[to] || to;
+
+        const callId = calls[socket.id];
+        if (callId) {
+            const call = await Call.findById(callId);
+            if (call) {
+                call.endTime = Date.now();
+                call.duration = (call.endTime - call.startTime) / 1000;
+                if (call.status === 'initiated') call.status = 'missed';
+                else call.status = 'ended';
+                await call.save();
+            }
+            delete calls[socket.id];
+            if (receiverSocketId) delete calls[receiverSocketId];
+        }
+
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('call-ended');
         }
@@ -152,9 +195,17 @@ io.on('connection', (socket) => {
         console.log('Client disconnected');
     });
 
-    socket.on('reject-call', (data) => {
+    socket.on('reject-call', async (data) => {
         const { to } = data;
         const receiverSocketId = users[to] || to;
+
+        const callId = calls[socket.id];
+        if (callId) {
+            await Call.findByIdAndUpdate(callId, { status: 'rejected' });
+            delete calls[socket.id];
+            if (receiverSocketId) delete calls[receiverSocketId];
+        }
+
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('call-rejected');
         }
