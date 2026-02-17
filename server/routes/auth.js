@@ -24,21 +24,29 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Seed Route (to ensure default user exists)
+// Seed Route
 router.post('/seed', async (req, res) => {
     try {
-        const defaultUser = await User.findOne({ username: 'vishnuHima' });
-        if (!defaultUser) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash('71125', salt);
-            const newUser = new User({
-                username: 'vishnuHima',
-                password: hashedPassword
-            });
-            await newUser.save();
-            return res.json({ message: 'Default user created' });
+        const usersToSeed = ['vishnu', 'hima'];
+        const password = '71125';
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        let createdCount = 0;
+
+        for (const username of usersToSeed) {
+            const existingUser = await User.findOne({ username });
+            if (!existingUser) {
+                const newUser = new User({
+                    username,
+                    password: hashedPassword
+                });
+                await newUser.save();
+                createdCount++;
+            }
         }
-        res.json({ message: 'Default user already exists' });
+
+        res.json({ message: `Seeding complete. Created ${createdCount} new users.` });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
