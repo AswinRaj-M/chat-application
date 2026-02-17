@@ -55,7 +55,7 @@ app.use('/api/messages', async (req, res) => {
 });
 
 app.use(cors({
-  origin: "https://chat-application-chi-ivory.vercel.app",
+  origin: "https://chat-application-chi-ivory.vercel.app/login",
   credentials: true
 }));
 
