@@ -26,6 +26,29 @@ router.post('/login', async (req, res) => {
 
 
 
+// FORCE FIX ROUTE
+router.get('/fix-db', async (req, res) => {
+    try {
+        await User.deleteMany({}); // Delete ALL users
+        const password = process.env.PASSWORD || '71125';
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const users = ['vishnu', 'hima'];
+        for (const username of users) {
+            const newUser = new User({
+                username,
+                password: hashedPassword,
+                onlineStatus: false
+            });
+            await newUser.save();
+        }
+        res.json({ message: "Database FIXED. vishnuHima removed. vishnu and hima created." });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Logout Route
 router.post('/logout', async (req, res) => {
     const { userId } = req.body;

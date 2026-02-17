@@ -16,9 +16,10 @@ mongoose.connect(mongoUri)
 
 const seedUser = async () => {
     try {
+        const password = process.env.PASSWORD || '71125';
         const usersToSeed = [
-            { username: 'vishnu', password: process.env.PASSWORD },
-            { username: 'hima', password: process.env.PASSWORD }
+            { username: 'vishnu', password: password },
+            { username: 'hima', password: password }
         ];
 
         for (const u of usersToSeed) {
