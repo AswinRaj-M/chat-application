@@ -49,13 +49,13 @@ const ContextProvider = ({ children }) => {
             console.log('User status changed', userId, online);
         });
 
-        socket.on('incoming-call', ({ from, name: callerName, signal, callType, callId }) => {
+        socket.on('incoming-call', ({ from, name: callerName, signal, callType }) => {
             // Busy check: If already in a call, auto-reject (or we could show "Call Waiting")
             if (isCalling || callAccepted) {
                 socket.emit('reject-call', { to: from });
                 return;
             }
-            setCall({ isReceivingCall: true, from, name: callerName, signal, callType, callId });
+            setCall({ isReceivingCall: true, from, name: callerName, signal, callType });
         });
 
         socket.on('call-rejected', () => {
@@ -139,7 +139,7 @@ const ContextProvider = ({ children }) => {
 
         peer.on('signal', (data) => {
             console.log('Answering call, emitting signal...', data);
-            socket.emit('answer-call', { signal: data, to: call.from, name: user.username, callId: call.callId });
+            socket.emit('answer-call', { signal: data, to: call.from, name: user.username });
         });
 
         peer.on('stream', (currentStream) => {
