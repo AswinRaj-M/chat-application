@@ -165,9 +165,13 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 5000;
+console.log(`Starting server in mode: ${process.env.NODE_ENV || 'development'}`);
+console.log(`Current working directory: ${process.cwd()}`);
+
 const startServer = (port) => {
-    server.listen(port, () => {
+    server.listen(port, '0.0.0.0', () => {
         console.log(`Server running on port ${port}`);
+        console.log(`Health check available at http://0.0.0.0:${port}/`);
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
             console.log(`Port ${port} is busy, trying ${port + 1}`);
