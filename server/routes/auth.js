@@ -28,11 +28,19 @@ router.post('/login', async (req, res) => {
 router.post('/seed', async (req, res) => {
     try {
         const usersToSeed = ['vishnu', 'hima'];
-        const password = '71125';
+        const password = process.env.PASSWORD; // Get password from env
+
+        if (!password) {
+            return res.status(400).json({ error: "PASSWORD environment variable is not set." });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         let createdCount = 0;
+
+        // Cleanup old user if exists
+        await User.findOneAndDelete({ username: 'vishnuHima' });
 
         for (const username of usersToSeed) {
             const existingUser = await User.findOne({ username });
@@ -46,7 +54,7 @@ router.post('/seed', async (req, res) => {
             }
         }
 
-        res.json({ message: `Seeding complete. Created ${createdCount} new users.` });
+        res.json({ message: `Seeding complete. Removed 'vishnuHima'. Created ${createdCount} new users ('vishnu', 'hima').` });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
