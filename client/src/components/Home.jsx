@@ -1,16 +1,12 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
-import.meta.env.VITE_API_URL
-
 
 const Home = () => {
     const {
         user, socket, call, callAccepted, myVideo, userVideo,
         stream, callEnded, callUser, leaveCall, rejectCall, toggleMute, isMuted, remoteMuted, answerCall, getMedia, isCalling, logoutUser
     } = useContext(SocketContext);
-
-    // ... (rest of code)
 
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -26,7 +22,7 @@ const Home = () => {
         }
 
         // Fetch users
-        fetch(process.env.VITE_API_UR)
+        fetch(import.meta.env.VITE_API_URL)
             .then(res => res.json())
             .then(data => setUsers(data.filter(u => u._id !== user.id)));
 
@@ -37,7 +33,7 @@ const Home = () => {
     useEffect(() => {
         if (selectedUser) {
             // Fetch messages
-          fetch(`${import.meta.env.VITE_API_URL}/api/messages?senderId=${user.id}&receiverId=${selectedUser._id}`)
+            fetch(`${import.meta.env.VITE_API_URL}/api/messages?senderId=${user.id}&receiverId=${selectedUser._id}`)
                 .then(res => res.json())
                 .then(data => setMessages(data));
         }

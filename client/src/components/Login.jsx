@@ -1,7 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { SocketContext } from '../context/SocketContext';
-import { useNavigate } from 'react-router-dom';
-import.meta.env.VITE_API_URL
 
 const Login = () => {
     const { loginUser, user } = useContext(SocketContext);
@@ -16,11 +14,10 @@ const Login = () => {
             navigate('/');
         }
     }, [user, navigate]);
-
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(process.env.VITE_API_UR, {
+            const res = await fetch(import.meta.env.VITE_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
