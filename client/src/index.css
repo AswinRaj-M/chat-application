@@ -172,20 +172,25 @@ body {
     gap: 0.5rem;
   }
 
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  /* When visible, occupy full available space */
   .sidebar {
     width: 100%;
-    height: 150px;
-    /* Fixed height for contact list on mobile */
-    padding: 1rem;
-    margin-bottom: 0.5rem;
+    height: 100%;
+    flex: 1;
+    margin-bottom: 0;
   }
 
   .chat-area {
     width: 100%;
-    height: calc(100vh - 180px);
-    /* Remaining height */
+    height: 100%;
+    flex: 1;
   }
 
+  /* Reset video grid for mobile if needed */
   .video-grid {
     flex-direction: column;
     align-items: center;
@@ -194,12 +199,10 @@ body {
   .video-wrapper {
     width: 100%;
     height: 48%;
-    /* Stack videos */
   }
 
   .btn {
     padding: 0.5rem 1rem;
-    /* Smaller buttons */
     font-size: 0.9rem;
   }
 
