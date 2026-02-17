@@ -23,6 +23,11 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
+// Health Check
+app.get('/', (req, res) => {
+    res.send("Server is running!");
+});
+
 // Log URI (mask password if present)
 console.log('Connecting to MongoDB...');
 
