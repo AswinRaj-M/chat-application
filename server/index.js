@@ -7,7 +7,7 @@ const socketIo = require('socket.io');
 const authRoutes = require('./routes/auth');
 const User = require('./models/User');
 const Message = require('./models/Message');
-const Message = require('./models/Message');
+
 
 dotenv.config();
 
