@@ -28,6 +28,11 @@ app.get('/', (req, res) => {
     res.send("DEPLOYMENT SUCCESS! Server is running with NEW code.");
 });
 
+app.get('/check-users', async (req, res) => {
+    const users = await User.find({});
+    res.json(users);
+});
+
 // Log URI (mask password if present)
 console.log('Connecting to MongoDB...');
 
