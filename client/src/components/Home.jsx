@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useNavigate } from 'react-router-dom';
+import.meta.env.VITE_API_URL
+
 
 const Home = () => {
     const {
@@ -35,7 +37,7 @@ const Home = () => {
     useEffect(() => {
         if (selectedUser) {
             // Fetch messages
-            fetch(`http://localhost:5000/api/messages?senderId=${user.id}&receiverId=${selectedUser._id}`)
+          fetch(`${import.meta.env.VITE_API_URL}/api/messages?senderId=${user.id}&receiverId=${selectedUser._id}`)
                 .then(res => res.json())
                 .then(data => setMessages(data));
         }
