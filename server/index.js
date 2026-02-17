@@ -25,7 +25,7 @@ app.use(express.json());
 
 // Health Check
 app.get('/', (req, res) => {
-    res.send("Server is running!");
+    res.send("DEPLOYMENT SUCCESS! Server is running with NEW code.");
 });
 
 // Log URI (mask password if present)
