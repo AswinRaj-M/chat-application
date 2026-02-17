@@ -24,7 +24,7 @@ const Home = () => {
         }
 
         // Fetch users
-        fetch('http://localhost:5000/api/auth/users')
+        fetch(process.env.VITE_API_UR)
             .then(res => res.json())
             .then(data => setUsers(data.filter(u => u._id !== user.id)));
 
