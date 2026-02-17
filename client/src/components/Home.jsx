@@ -22,7 +22,7 @@ const Home = () => {
         }
 
         // Fetch users
-        fetch(`${import.meta.env.VITE_API_URL}/api/users`)
+        fetch(`${import.meta.env.VITE_API_URL}/api/auth/users`)
             .then(res => res.json())
             .then(data => setUsers(data.filter(u => u._id !== user.id)));
 
