@@ -54,10 +54,7 @@ app.use('/api/messages', async (req, res) => {
     }
 });
 
-app.use(cors({
-    origin: "*",
-    credentials: true
-}));
+
 
 
 // Socket.IO Logic
