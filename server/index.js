@@ -54,6 +54,12 @@ app.use('/api/messages', async (req, res) => {
     }
 });
 
+app.use(cors({
+  origin: "https://your-vercel-url.vercel.app",
+  credentials: true
+}));
+
+
 // Socket.IO Logic
 let users = {}; // userId -> socketId
 
