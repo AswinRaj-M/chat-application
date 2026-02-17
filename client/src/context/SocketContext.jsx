@@ -129,7 +129,17 @@ const ContextProvider = ({ children }) => {
     const answerCall = (currentStream) => {
         setCallAccepted(true);
         // Ensure stream is valid
-        const peer = new Peer({ initiator: false, trickle: false, stream: currentStream || stream });
+        const peer = new Peer({
+            initiator: false,
+            trickle: false,
+            stream: currentStream || stream,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
+        });
 
         peer.on('error', (err) => {
             console.error('Peer connection error (answer):', err);
@@ -157,7 +167,17 @@ const ContextProvider = ({ children }) => {
         // Store call details locally: name should be the CALLEE's name for the caller's UI
         setCall({ isReceivingCall: false, from: me, name: calleeName, callType: type, userToCall: id });
 
-        const peer = new Peer({ initiator: true, trickle: false, stream: currentStream || stream });
+        const peer = new Peer({
+            initiator: true,
+            trickle: false,
+            stream: currentStream || stream,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
+        });
 
         peer.on('error', (err) => {
             console.error('Peer connection error (caller):', err);
