@@ -11,8 +11,7 @@ import {
     Home as HomeIcon, 
     MessageSquare, 
     Bell, 
-    Settings, 
-    LogOut, 
+    Settings,
     Search, 
     Users, 
     User, 
@@ -24,9 +23,10 @@ import {
     Camera, 
     Mic, 
     Send,
-    LogOut as LogOutIcon,
-    AlertCircle,
-    LayoutDashboard
+    LogOut,
+    Trash2,
+    Menu,
+    ChevronLeft
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -67,8 +67,9 @@ const Dashboard = () => {
     const fetchFriends = () => {
         if (!user) return;
         fetch(`${import.meta.env.VITE_API_URL}/api/connections/friends/${user.id}`)
-            .then(res => res.json())
-            .then(data => setUsers(data));
+            .then(res => res.ok ? res.json() : [])
+            .then(data => setUsers(Array.isArray(data) ? data : []))
+            .catch(() => setUsers([]));
     };
 
     const fetchPendingRequests = () => {
@@ -94,7 +95,7 @@ const Dashboard = () => {
         fetch(`${import.meta.env.VITE_API_URL}/api/connections/request`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requesterId: user.id, recipientId })
+            body: JSON.stringify({ requesterId: (user?.id || user?._id), recipientId })
         })
             .then(res => res.json())
             .then(data => {
@@ -327,7 +328,11 @@ const Dashboard = () => {
             </div>
 
             {/* Middle Column (Friends/Search) - Only visible on specific views */}
-            <div className="contacts-column" style={{ display: (mainView === 'home' || mainView === 'profile' || mainView === 'settings' || mainView === 'notifications') ? 'none' : 'flex' }}>
+            <div className="contacts-column" style={{ 
+                display: (mainView === 'home' || mainView === 'profile' || mainView === 'settings' || mainView === 'notifications' || (mainView === 'chat' && selectedUser)) ? 'none' : 'flex',
+                width: '100%',
+                maxWidth: (mainView === 'chat' && !selectedUser) ? 'none' : '350px'
+            }}>
                 <div className="search-container">
                     <Search size={20} color="var(--text-muted)" />
                     <input 
@@ -380,7 +385,7 @@ const Dashboard = () => {
                             </motion.div>
                         ))}
 
-                        {searchQuery.length === 0 && activeTab === 'friends' && users.map(u => (
+                        {searchQuery.length === 0 && activeTab === 'friends' && Array.isArray(users) && users.map(u => (
                             <motion.div 
                                 layout
                                 key={u._id} 
@@ -409,7 +414,12 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="main-viewport" style={{ flex: 1, padding: '1rem', overflowY: 'auto' }}>
+            <div className="main-viewport" style={{ 
+                flex: 1, 
+                padding: (mainView === 'home' || mainView === 'notifications') ? '0' : '1rem', 
+                overflowY: 'auto',
+                display: (mainView === 'chat' && !selectedUser) ? 'none' : 'block'
+            }}>
                 <AnimatePresence mode="wait">
                     {mainView === 'home' && (
                         <DashboardHome key="home" user={user} onNavigate={navigate} />
@@ -425,8 +435,11 @@ const Dashboard = () => {
                         >
                             {selectedUser ? (
                                 <div className="section-card" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}>
-                                    <div className="chat-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--bg-input)' }}>
+                                    <div className="chat-header" style={{ padding: 'clamp(0.75rem, 2vh, 1.5rem)', borderBottom: '1px solid var(--bg-input)' }}>
                                         <div className="header-user">
+                                            <div className="mobile-only" onClick={() => setSelectedUser(null)} style={{ marginRight: '0.5rem', cursor: 'pointer' }}>
+                                                <ChevronLeft size={24} />
+                                            </div>
                                             {selectedUser.profileImage ? (
                                                 <img src={selectedUser.profileImage} alt={selectedUser.username} className="avatar" />
                                             ) : (

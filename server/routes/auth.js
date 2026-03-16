@@ -77,12 +77,21 @@ router.get('/fix-db', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const users = ['vishnu', 'hima'];
-        for (const username of users) {
+        const sampleUsers = [
+            { username: 'vishnu', age: 24, qualification: 'Software Engineer', bio: 'Tech enthusiast and code lover 💻' },
+            { username: 'hima', age: 22, qualification: 'Medical Student', bio: 'Saving lives and enjoying coffee ☕' },
+            { username: 'kunjootan', age: 25, qualification: 'Architect', bio: 'Designing spaces and dreaming big 🏛️' },
+            { username: 'aswin', age: 23, qualification: 'Artist', bio: 'Expressing life through colors and brush 🎨' }
+        ];
+
+        for (const u of sampleUsers) {
             const newUser = new User({
-                username,
+                username: u.username,
                 password: hashedPassword,
-                onlineStatus: false
+                onlineStatus: false,
+                age: u.age,
+                qualification: u.qualification,
+                bio: u.bio
             });
             await newUser.save();
         }
@@ -128,13 +137,15 @@ router.get('/search', async (req, res) => {
 
 // Update Profile
 router.put('/profile', async (req, res) => {
-    const { userId, profileImage, coverImage, bio, location } = req.body;
+    const { userId, profileImage, coverImage, bio, location, age, qualification } = req.body;
     try {
         const updateData = {};
         if (profileImage !== undefined) updateData.profileImage = profileImage;
         if (coverImage !== undefined) updateData.coverImage = coverImage;
         if (bio !== undefined) updateData.bio = bio;
         if (location !== undefined) updateData.location = location;
+        if (age !== undefined) updateData.age = age;
+        if (qualification !== undefined) updateData.qualification = qualification;
 
         const user = await User.findByIdAndUpdate(
             userId, 

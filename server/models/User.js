@@ -29,6 +29,22 @@ const UserSchema = new mongoose.Schema({
   location: {
     type: String,
     default: '',
+  },
+  dailyRequestCount: {
+    type: Number,
+    default: 0
+  },
+  lastRequestDate: {
+    type: Date,
+    default: null
+  },
+  age: {
+    type: Number,
+    default: 18
+  },
+  qualification: {
+    type: String,
+    default: 'Independent'
   }
 }, { timestamps: true });
 

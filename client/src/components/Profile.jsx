@@ -1,8 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, X, Camera, MapPin, AlignLeft, Moon, Sun } from 'lucide-react';
+import { User, X, Camera, MapPin, AlignLeft, Moon, Sun, Check, Scissors } from 'lucide-react';
 import { toast } from 'sonner';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../utils/cropImage';
 
 const Profile = ({ onClose }) => {
     const { user, loginUser } = useContext(SocketContext);
@@ -11,17 +13,47 @@ const Profile = ({ onClose }) => {
     const [cover, setCover] = useState(user?.coverImage || '');
     const [bio, setBio] = useState(user?.bio || '');
     const [location, setLocation] = useState(user?.location || '');
+    const [age, setAge] = useState(user?.age || 18);
+    const [qualification, setQualification] = useState(user?.qualification || '');
     const [uploading, setUploading] = useState(false);
+
+    // Cropper State
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [showCropper, setShowCropper] = useState(false);
+    const [tempImage, setTempImage] = useState(null);
 
     const handleImageChange = (e, type) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                if (type === 'profile') setImage(reader.result);
-                else setCover(reader.result);
+                if (type === 'profile') {
+                    setTempImage(reader.result);
+                    setShowCropper(true);
+                } else {
+                    setCover(reader.result);
+                }
             };
             reader.readAsDataURL(file);
+        }
+    };
+
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
+
+    const handleCropSave = async () => {
+        try {
+            const croppedImage = await getCroppedImg(tempImage, croppedAreaPixels);
+            setImage(croppedImage);
+            setShowCropper(false);
+            setTempImage(null);
+            toast.success('Photo cropped successfully!');
+        } catch (e) {
+            console.error(e);
+            toast.error('Failed to crop image');
         }
     };
 
@@ -36,7 +68,9 @@ const Profile = ({ onClose }) => {
                     profileImage: image, 
                     coverImage: cover,
                     bio, 
-                    location 
+                    location,
+                    age,
+                    qualification
                 })
             });
             if (res.ok) {
@@ -46,7 +80,9 @@ const Profile = ({ onClose }) => {
                     profileImage: updatedUser.profileImage, 
                     coverImage: updatedUser.coverImage,
                     bio: updatedUser.bio,
-                    location: updatedUser.location
+                    location: updatedUser.location,
+                    age: updatedUser.age,
+                    qualification: updatedUser.qualification
                 });
                 toast.success('Settings updated successfully!');
                 if (onClose) onClose();
@@ -84,7 +120,7 @@ const Profile = ({ onClose }) => {
             <div style={{ marginBottom: '2rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>Cover Photo</label>
                 <div style={{ 
-                    height: '160px', 
+                    height: 'clamp(120px, 20vh, 160px)', 
                     borderRadius: '20px', 
                     background: cover ? `url(${cover}) center/cover` : 'linear-gradient(90deg, var(--accent) 0%, #6366f1 100%)',
                     position: 'relative',
@@ -153,6 +189,36 @@ const Profile = ({ onClose }) => {
                     />
                 </div>
             </div>
+ 
+            <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 700 }}>Age</label>
+                    <div className="search-container" style={{ padding: '0.85rem 1rem' }}>
+                        <input 
+                            type="number"
+                            value={age}
+                            onChange={(e) => setAge(e.target.value)}
+                            placeholder="Age"
+                            min="18"
+                            max="100"
+                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'var(--text-main)', fontSize: '1rem' }}
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label style={{ display: 'block', marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 700 }}>Qualification</label>
+                    <div className="search-container" style={{ padding: '0.85rem 1rem' }}>
+                        <input 
+                            type="text"
+                            value={qualification}
+                            onChange={(e) => setQualification(e.target.value)}
+                            placeholder="e.g. MBBS, Engineer"
+                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'var(--text-main)', fontSize: '1rem' }}
+                        />
+                    </div>
+                </div>
+            </div>
+
 
             <div style={{ marginBottom: '2rem' }}>
                 <label style={{ display: 'block', marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>Appearance</label>
@@ -188,6 +254,60 @@ const Profile = ({ onClose }) => {
             >
                 {uploading ? 'Applying Changes...' : 'Save Settings'}
             </button>
+
+            {/* Cropper Modal */}
+            {showCropper && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.9)', zIndex: 3000,
+                    display: 'flex', flexDirection: 'column', padding: '20px'
+                }}>
+                    <div style={{ 
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+                        padding: '10px 0', color: 'white', marginBottom: '10px' 
+                    }}>
+                        <h3 style={{ margin: 0 }}>Crop Profile Photo</h3>
+                        <button 
+                            onClick={() => setShowCropper(false)}
+                            style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+
+                    <div style={{ position: 'relative', flex: 1, background: '#111', borderRadius: '20px', overflow: 'hidden' }}>
+                        <Cropper
+                            image={tempImage}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={1}
+                            onCropChange={setCrop}
+                            onCropComplete={onCropComplete}
+                            onZoomChange={setZoom}
+                        />
+                    </div>
+
+                    <div style={{ padding: '20px 0', background: 'transparent' }}>
+                        <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            aria-labelledby="Zoom"
+                            onChange={(e) => setZoom(e.target.value)}
+                            style={{ width: '100%', marginBottom: '20px', accentColor: 'var(--accent)' }}
+                        />
+                        <button 
+                            onClick={handleCropSave}
+                            className="voice-btn" 
+                            style={{ width: '100%', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                        >
+                            <Check size={20} /> Apply Crop
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

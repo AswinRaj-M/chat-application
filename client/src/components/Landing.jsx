@@ -44,7 +44,7 @@ const Landing = () => {
     return (
         <div style={{ background: 'var(--bg-app)', minHeight: '100vh', overflowX: 'hidden' }}>
             {/* Header / Nav */}
-            <nav style={{ 
+            <nav className="mobile-padding" style={{ 
                 padding: '1.5rem 10%', 
                 display: 'flex', 
                 justifyContent: 'space-between', 
@@ -64,7 +64,7 @@ const Landing = () => {
                     </div>
                     <span style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Nexus</span>
                 </div>
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <motion.button
                         whileHover={{ scale: 1.1, rotate: 10 }}
                         whileTap={{ scale: 0.9 }}
@@ -74,51 +74,39 @@ const Landing = () => {
                         {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                     </motion.button>
                     <motion.button 
+                        className="desktop-only"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="button"
-                        onClick={() => {
-                            console.log("Navigating to login...");
-                            navigate('/login');
-                        }}
-                        style={{ 
-                            background: 'none', 
-                            border: 'none', 
-                            fontWeight: 600, 
-                            cursor: 'pointer', 
-                            color: 'var(--text-main)',
-                            padding: '8px 12px'
-                        }}
+                        onClick={() => navigate('/login')}
+                        style={{ background: 'none', border: 'none', fontWeight: 600, cursor: 'pointer', color: 'var(--text-main)', padding: '8px 12px' }}
                     >
                         Login
                     </motion.button>
                     <motion.button 
-                        whileHover={{ scale: 1.05, boxShadow: '0 10px 20px -5px rgba(139, 92, 246, 0.5)' }}
+                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         type="button"
-                        onClick={() => {
-                            console.log("Navigating to signup...");
-                            navigate('/signup');
-                        }}
+                        onClick={() => navigate('/signup')}
                         style={{ 
                             background: 'var(--accent)', 
                             color: 'white', 
-                            padding: '12px 24px', 
+                            padding: 'clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px)', 
                             borderRadius: '14px', 
                             border: 'none', 
                             fontWeight: 700, 
                             cursor: 'pointer',
-                            boxShadow: '0 10px 15px -3px rgba(139, 92, 246, 0.3)'
+                            fontSize: '0.9rem'
                         }}
                     >
-                        Get Started
+                        Join Now
                     </motion.button>
                 </div>
             </nav>
 
             {/* Hero Section */}
-            <section style={{ 
-                padding: '160px 10% 80px 10%', 
+            <section className="mobile-padding" style={{ 
+                padding: 'clamp(100px, 15vh, 160px) 10% 80px 10%', 
                 textAlign: 'center',
                 background: theme === 'dark' ? 'radial-gradient(circle at top right, #1e1b4b, transparent)' : 'radial-gradient(circle at top right, #ede9fe, transparent)',
                 position: 'relative',
@@ -134,8 +122,8 @@ const Landing = () => {
                         <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)' }}>New: Crystal Clear Video Calls</span>
                     </motion.div>
                     
-                    <motion.h1 variants={itemVariants} style={{ 
-                        fontSize: '4.5rem', 
+                    <motion.h1 className="hero-title" variants={itemVariants} style={{ 
+                        fontSize: 'clamp(2.5rem, 8vw, 4.5rem)', 
                         fontWeight: 900, 
                         lineHeight: 1.1, 
                         color: 'var(--text-main)',
@@ -146,8 +134,8 @@ const Landing = () => {
                         Connecting people in <span style={{ color: 'var(--accent)' }}>real-time</span> across the globe.
                     </motion.h1>
                     
-                    <motion.p variants={itemVariants} style={{ 
-                        fontSize: '1.25rem', 
+                    <motion.p className="hero-p" variants={itemVariants} style={{ 
+                        fontSize: 'clamp(1rem, 3vw, 1.25rem)', 
                         color: 'var(--text-muted)', 
                         maxWidth: '650px', 
                         margin: '0 auto 3rem auto',
@@ -156,22 +144,19 @@ const Landing = () => {
                         Experience the next generation of social messaging. Secure, fast, and beautiful. Built for modern connections.
                     </motion.p>
                     
-                    <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
+                    <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                         <motion.button 
-                            whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgba(139, 92, 246, 0.5)' }}
+                            whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             type="button"
-                            onClick={() => {
-                                console.log("Navigating to signup from hero...");
-                                navigate('/signup');
-                            }}
+                            onClick={() => navigate('/signup')}
                             style={{ 
-                                padding: '18px 40px', 
+                                padding: 'clamp(14px, 2vh, 18px) clamp(24px, 4vw, 40px)', 
                                 borderRadius: '16px', 
                                 border: 'none', 
                                 background: 'var(--accent)', 
                                 color: 'white', 
-                                fontSize: '1.1rem', 
+                                fontSize: 'clamp(0.95rem, 2vw, 1.1rem)', 
                                 fontWeight: 700, 
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -184,12 +169,13 @@ const Landing = () => {
                         </motion.button>
                     </motion.div>
                 </motion.div>
-
+ 
                 {/* Simulated App Screenshot */}
                 <motion.div 
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 1, duration: 1 }}
+                    className="desktop-only"
                     style={{ 
                         marginTop: '5rem',
                         background: 'var(--bg-card)',
@@ -212,9 +198,9 @@ const Landing = () => {
             </section>
 
             {/* Why This App? */}
-            <section style={{ padding: '100px 10%' }}>
-                <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Why Nexus?</h2>
+            <section className="mobile-padding" style={{ padding: 'clamp(50px, 10vh, 100px) 10%' }}>
+                <div style={{ textAlign: 'center', marginBottom: 'clamp(3rem, 8vh, 5rem)' }}>
+                    <h2 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 800 }}>Why Nexus?</h2>
                     <p style={{ color: 'var(--text-muted)' }}>We built this app to solve the problems of modern communication.</p>
                 </div>
 
@@ -244,10 +230,10 @@ const Landing = () => {
             </section>
 
             {/* How It Works */}
-            <section style={{ padding: '100px 10%', background: 'var(--bg-card)' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center' }}>
+            <section className="mobile-padding" style={{ padding: 'clamp(50px, 10vh, 100px) 10%', background: 'var(--bg-card)' }}>
+                <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(2rem, 5vw, 5rem)', alignItems: 'center' }}>
                     <motion.div initial={{ x: -50, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }}>
-                        <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '2rem' }}>How it works.</h2>
+                        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, marginBottom: '2rem' }}>How it works.</h2>
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                             {[
@@ -265,21 +251,22 @@ const Landing = () => {
                             ))}
                         </div>
                     </motion.div>
-
+ 
                     <motion.div 
                         initial={{ x: 50, opacity: 0 }} 
                         whileInView={{ x: 0, opacity: 1 }} 
                         viewport={{ once: true }}
-                        style={{ background: 'var(--bg-app)', borderRadius: '30px', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        style={{ background: 'var(--bg-app)', borderRadius: '30px', height: 'clamp(250px, 40vh, 400px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                         <Users size={120} style={{ color: 'var(--accent)', opacity: 0.2 }} />
+                         <Users size={80} className="mobile-only" style={{ color: 'var(--accent)', opacity: 0.2 }} />
+                         <Users size={120} className="desktop-only" style={{ color: 'var(--accent)', opacity: 0.2 }} />
                     </motion.div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer style={{ padding: '80px 10% 40px 10%', background: '#1e293b', color: 'white' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4rem' }}>
+            <footer className="mobile-padding" style={{ padding: '80px 10% 40px 10%', background: '#1e293b', color: 'white' }}>
+                <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'flex-start', marginBottom: '4rem' }}>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
                             <MessageCircle size={32} />
@@ -287,7 +274,7 @@ const Landing = () => {
                         </div>
                         <p style={{ color: '#94a3b8', maxWidth: '300px' }}>The future of social communication. Stay connected, stay secure.</p>
                     </div>
-                    <div style={{ display: 'flex', gap: '4rem' }}>
+                    <div style={{ display: 'flex', gap: 'clamp(2rem, 8vw, 4rem)', flexWrap: 'wrap' }}>
                         <div>
                             <h5 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Links</h5>
                             <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem', color: '#94a3b8' }}>
