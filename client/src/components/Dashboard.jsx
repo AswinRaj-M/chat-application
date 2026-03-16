@@ -63,6 +63,8 @@ const Dashboard = () => {
         else if (path === '/home') setMainView('home');
         else if (path === '/message') setMainView('chat');
     }, [location.pathname]);
+ 
+    const noContacts = ['home', 'profile', 'settings', 'notifications'].includes(mainView);
 
     const fetchFriends = () => {
         if (!user) return;
@@ -328,10 +330,9 @@ const Dashboard = () => {
             </div>
 
             {/* Middle Column (Friends/Search) - Only visible on specific views */}
-            <div className="contacts-column" style={{ 
-                display: (mainView === 'home' || mainView === 'profile' || mainView === 'settings' || mainView === 'notifications' || (mainView === 'chat' && selectedUser)) ? 'none' : 'flex',
-                width: '100%',
-                maxWidth: (mainView === 'chat' && !selectedUser) ? 'none' : '350px'
+            <div className={`contacts-column ${selectedUser ? 'mobile-hide' : ''}`} style={{ 
+                display: noContacts ? 'none' : 'flex',
+                flexShrink: 0
             }}>
                 <div className="search-container">
                     <Search size={20} color="var(--text-muted)" />
@@ -414,11 +415,9 @@ const Dashboard = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="main-viewport" style={{ 
+            <div className={`main-viewport ${(mainView === 'chat' && !selectedUser) ? 'mobile-hide' : ''}`} style={{ 
                 flex: 1, 
-                padding: (mainView === 'home' || mainView === 'notifications') ? '0' : '1rem', 
-                overflowY: 'auto',
-                display: (mainView === 'chat' && !selectedUser) ? 'none' : 'block'
+                padding: (mainView === 'home' || mainView === 'notifications') ? '0' : '1rem'
             }}>
                 <AnimatePresence mode="wait">
                     {mainView === 'home' && (
@@ -497,9 +496,35 @@ const Dashboard = () => {
                                     </form>
                                 </div>
                             ) : (
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexDirection: 'column', gap: '1rem' }}>
-                                    <motion.div animate={{ y: [0, -10, 0] }} transition={{ repeat: Infinity, duration: 4 }} style={{ color: 'var(--accent)', opacity: 0.2 }}><MessageSquare size={100} /></motion.div>
-                                    <p>Select a contact to start messaging</p>
+                                <div style={{ 
+                                    flex: 1, 
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', 
+                                    color: 'var(--text-muted)',
+                                    background: 'var(--bg-app)',
+                                    borderRadius: 'var(--radius-xl)',
+                                    margin: '0.5rem',
+                                    textAlign: 'center'
+                                }}>
+                                    <motion.div 
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', damping: 10 }}
+                                        style={{ 
+                                            background: 'var(--bg-card)', 
+                                            padding: '2rem', 
+                                            borderRadius: '40px', 
+                                            boxShadow: 'var(--shadow-blue)',
+                                            marginBottom: '2rem',
+                                            color: 'var(--accent)'
+                                        }}
+                                    >
+                                        <MessageSquare size={64} strokeWidth={1.5} />
+                                    </motion.div>
+                                    <h2 style={{ color: 'var(--text-main)', marginBottom: '0.5rem', fontWeight: 800 }}>Your Conversations</h2>
+                                    <p style={{ maxWidth: '300px', lineHeight: '1.6' }}>Select a person from the left to start a real-time conversation or video call.</p>
                                 </div>
                             )}
                         </motion.div>
