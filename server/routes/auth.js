@@ -3,6 +3,40 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+// Signup Route
+router.post('/signup', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            username,
+            password: hashedPassword
+        });
+
+        await newUser.save();
+        res.status(201).json({ 
+            message: 'User created successfully', 
+            user: { 
+                id: newUser._id, 
+                username: newUser.username, 
+                profileImage: newUser.profileImage,
+                coverImage: newUser.coverImage,
+                bio: newUser.bio,
+                location: newUser.location
+            } 
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Login Route
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -18,7 +52,16 @@ router.post('/login', async (req, res) => {
         user.onlineStatus = true;
         await user.save();
 
-        res.json({ user: { id: user._id, username: user.username } });
+        res.json({ 
+            user: { 
+                id: user._id, 
+                username: user.username, 
+                profileImage: user.profileImage,
+                coverImage: user.coverImage,
+                bio: user.bio,
+                location: user.location
+            } 
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -65,6 +108,40 @@ router.get('/users', async (req, res) => {
     try {
         const users = await User.find({}, 'username onlineStatus');
         res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Search Users
+router.get('/search', async (req, res) => {
+    const { username } = req.query;
+    try {
+        const users = await User.find({ 
+            username: { $regex: username, $options: 'i' } 
+        }, 'username onlineStatus profileImage');
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update Profile
+router.put('/profile', async (req, res) => {
+    const { userId, profileImage, coverImage, bio, location } = req.body;
+    try {
+        const updateData = {};
+        if (profileImage !== undefined) updateData.profileImage = profileImage;
+        if (coverImage !== undefined) updateData.coverImage = coverImage;
+        if (bio !== undefined) updateData.bio = bio;
+        if (location !== undefined) updateData.location = location;
+
+        const user = await User.findByIdAndUpdate(
+            userId, 
+            updateData, 
+            { new: true }
+        ).select('-password');
+        res.json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

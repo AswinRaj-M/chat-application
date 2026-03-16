@@ -5,9 +5,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const socketIo = require('socket.io');
 const authRoutes = require('./routes/auth');
+const connectionRoutes = require('./routes/connections');
+const Connection = require('./models/Connection');
 const User = require('./models/User');
 const Message = require('./models/Message');
-
 
 dotenv.config();
 
@@ -50,9 +51,23 @@ mongoose.connect(mongoUri)
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/connections', connectionRoutes);
+
 app.use('/api/messages', async (req, res) => {
     const { senderId, receiverId } = req.query;
     try {
+        // Check if friends
+        const friendship = await Connection.findOne({
+            $or: [
+                { requester: senderId, recipient: receiverId, status: 'accepted' },
+                { requester: receiverId, recipient: senderId, status: 'accepted' }
+            ]
+        });
+
+        if (!friendship) {
+            return res.status(403).json({ message: 'You can only message friends' });
+        }
+
         const messages = await Message.find({
             $or: [
                 { senderId, receiverId },
@@ -85,6 +100,16 @@ io.on('connection', (socket) => {
     socket.on('send-message', async (data) => {
         const { senderId, receiverId, text } = data;
         try {
+            // Socket level check for friendship (optional but good)
+            const friendship = await Connection.findOne({
+                $or: [
+                    { requester: senderId, recipient: receiverId, status: 'accepted' },
+                    { requester: receiverId, recipient: senderId, status: 'accepted' }
+                ]
+            });
+
+            if (!friendship) return; // Silent discard or emit error
+
             const newMessage = new Message({ senderId, receiverId, text });
             await newMessage.save();
 
@@ -158,6 +183,20 @@ io.on('connection', (socket) => {
         const receiverSocketId = users[to] || to;
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('call-rejected');
+        }
+    });
+
+    socket.on('send-friend-request', ({ recipientId, requesterName }) => {
+        const receiverSocketId = users[recipientId];
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit('friend-request-received', { requesterName });
+        }
+    });
+
+    socket.on('accept-friend-request', ({ requesterId, acceptorName }) => {
+        const receiverSocketId = users[requesterId];
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit('friend-request-accepted', { acceptorName });
         }
     });
 
