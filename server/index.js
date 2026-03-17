@@ -18,13 +18,17 @@ const server = http.createServer(app);
 // CORS Configuration
 const io = socketIo(server, {
     cors: {
-        origin: '*', // In production, replace with specific domain
-        methods: ['GET', 'POST'],
+        origin: ["http://localhost:5173", "http://localhost:3000"],
+        methods: ["GET", "POST"],
+        credentials: true
     },
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes

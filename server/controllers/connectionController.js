@@ -74,7 +74,10 @@ const getPendingRequests = async (req, res) => {
             recipient: req.params.userId,
             status: 'pending'
         }).populate('requester', 'username onlineStatus profileImage');
-        res.json(requests);
+        
+        // Filter out requests where the requester user has been deleted
+        const validRequests = requests.filter(req => req.requester !== null);
+        res.json(validRequests);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

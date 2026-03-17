@@ -121,6 +121,20 @@ const ContextProvider = ({ children }) => {
             ]);
         });
 
+        socket.on('receive-message', (msg) => {
+            setNotifications(prev => [
+                {
+                    id: Date.now(),
+                    type: 'message',
+                    title: 'New Message',
+                    message: msg.text.length > 30 ? msg.text.substring(0, 30) + '...' : msg.text,
+                    time: 'Just now',
+                    read: false
+                },
+                ...prev
+            ]);
+        });
+
         return () => {
             socket.off('connect', handleConnect);
             socket.off('user-status-change');
@@ -131,6 +145,7 @@ const ContextProvider = ({ children }) => {
             socket.off('call-ended');
             socket.off('friend-request-received');
             socket.off('friend-request-accepted');
+            socket.off('receive-message');
         };
 
     }, [user, isCalling, callAccepted]); // Added dependencies for busy check
@@ -172,7 +187,22 @@ const ContextProvider = ({ children }) => {
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
+                    { urls: 'stun:global.stun.twilio.com:3478' },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    }
                 ]
             }
         });
@@ -212,7 +242,22 @@ const ContextProvider = ({ children }) => {
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
+                    { urls: 'stun:global.stun.twilio.com:3478' },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:80',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:443',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    },
+                    { 
+                        urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                        username: 'openrelayproject',
+                        credential: 'openrelayproject'
+                    }
                 ]
             }
         });

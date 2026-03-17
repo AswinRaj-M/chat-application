@@ -162,8 +162,29 @@ const ChatPage = () => {
         };
     }, [socket, selectedUser, user, users]);
 
+    const scrollContainerRef = useRef();
+    const [prevMsgCount, setPrevMsgCount] = useState(0);
+
+    // Reliable scroll to bottom
     useEffect(() => {
-        scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (scrollContainerRef.current) {
+            const container = scrollContainerRef.current;
+            
+            // If it's a single new message, scroll smoothly
+            if (messages.length === prevMsgCount + 1) {
+                setTimeout(() => {
+                   container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                }, 50);
+            } else {
+                // Initial load or many messages, scroll instantly
+                container.scrollTop = container.scrollHeight;
+                // Double check after a small delay
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            }
+            setPrevMsgCount(messages.length);
+        }
     }, [messages, isTyping]);
 
     const handleInputCheck = (e) => {
@@ -245,7 +266,7 @@ const ChatPage = () => {
 
                     <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
                         <AnimatePresence>
-                        {searchQuery.length > 0 && searchResults.map(u => (
+                        {searchQuery.length > 0 && searchResults.map(u => (u && (
                             <motion.div key={u._id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="contact-item" onClick={() => sendFriendRequest(u._id)}>
                                 {u.profileImage ? <img src={u.profileImage} className="avatar" /> : <div className="avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>}
                                 <div className="contact-info">
@@ -253,9 +274,9 @@ const ChatPage = () => {
                                     <div className="contact-msg">Add to contacts</div>
                                 </div>
                             </motion.div>
-                        ))}
+                        )))}
 
-                        {searchQuery.length === 0 && activeTab === 'requests' && pendingRequests.map(req => (
+                        {searchQuery.length === 0 && activeTab === 'requests' && pendingRequests.map(req => (req?.requester && (
                             <motion.div key={req._id} initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="contact-item">
                                 {req.requester.profileImage ? <img src={req.requester.profileImage} className="avatar" /> : <div className="avatar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={20} /></div>}
                                 <div className="contact-info">
@@ -266,7 +287,7 @@ const ChatPage = () => {
                                     </div>
                                 </div>
                             </motion.div>
-                        ))}
+                        )))}
 
                         {searchQuery.length === 0 && activeTab === 'friends' && users.length === 0 && (
                             <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
@@ -343,7 +364,8 @@ const ChatPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="messages-area">
+                                <div className="messages-area" ref={scrollContainerRef}>
+                                    <div style={{ flex: 1 }}></div>
                                     {messages.map((m, i) => {
                                         const isMe = m.senderId === user.id;
                                         return (
@@ -365,7 +387,6 @@ const ChatPage = () => {
                                             </div>
                                         </div>
                                     )}
-                                    <div ref={scrollRef} />
                                 </div>
 
                                 <form onSubmit={handleSendMessage} className="chat-input-row">
