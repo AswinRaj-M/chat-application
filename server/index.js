@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // CORS Configuration
 const io = socketIo(server, {
     cors: {
-        origin: ["http://localhost:5173", "http://localhost:3000"],
+        origin: "*", // More permissive for testing/deployment
         methods: ["GET", "POST"],
         credentials: true
     },
@@ -26,10 +26,19 @@ const io = socketIo(server, {
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: (origin, callback) => {
+        // Allow all origins for now to solve the 'Network Error' issue
+        callback(null, true);
+    },
     credentials: true
 }));
 app.use(express.json());
+
+// Request logging for debugging
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
 
 // Routes
 const authRoutes = require('./routes/auth');
