@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { SocketContext } from '../context/SocketContext';
 import { motion } from 'framer-motion';
 import { 
     User, 
@@ -9,10 +10,12 @@ import {
     Link as LinkIcon, 
     Calendar,
     MessageCircle,
-    Check
+    Check,
+    LogOut
 } from 'lucide-react';
 
 const FullProfileView = ({ user, friends = [], onEdit }) => {
+    const { logoutUser } = useContext(SocketContext);
     return (
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -69,6 +72,18 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                             }}
                         >
                             <Edit3 size={18} /> Edit Profile
+                        </button>
+                        <button 
+                            onClick={logoutUser}
+                            className="mobile-only"
+                            style={{ 
+                                background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', 
+                                padding: '10px 24px', borderRadius: '14px', fontWeight: 700, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                color: '#ef4444'
+                            }}
+                        >
+                            <LogOut size={18} /> Logout
                         </button>
                     </div>
                 </div>

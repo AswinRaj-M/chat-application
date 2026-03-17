@@ -126,6 +126,7 @@ io.on('connection', (socket) => {
     socket.on('call-user', (data) => {
         const { userToCall, signalData, from, name, callType } = data;
         const receiverSocketId = users[userToCall];
+        console.log(`Call attempt from ${name} (${from}) to ${userToCall}. Receiver Socket: ${receiverSocketId || 'NOT FOUND'}`);
         if (receiverSocketId) {
             io.to(receiverSocketId).emit('incoming-call', {
                 signal: signalData,

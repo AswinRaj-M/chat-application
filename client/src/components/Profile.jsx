@@ -1,13 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useTheme } from '../context/ThemeContext';
-import { User, X, Camera, MapPin, AlignLeft, Moon, Sun, Check, Scissors } from 'lucide-react';
+import { User, X, Camera, MapPin, AlignLeft, Moon, Sun, Check, Scissors, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '../utils/cropImage';
 
 const Profile = ({ onClose }) => {
-    const { user, loginUser } = useContext(SocketContext);
+    const { user, loginUser, logoutUser } = useContext(SocketContext);
     const { theme, toggleTheme } = useTheme();
     const [image, setImage] = useState(user?.profileImage || '');
     const [cover, setCover] = useState(user?.coverImage || '');
@@ -267,6 +267,20 @@ const Profile = ({ onClose }) => {
                 style={{ width: '100%', height: '50px', borderRadius: '14px', fontSize: '1rem', fontWeight: 700 }}
             >
                 {uploading ? 'Applying Changes...' : 'Save Settings'}
+            </button>
+
+            <button 
+                onClick={logoutUser}
+                className="mobile-only"
+                style={{ 
+                    marginTop: '1rem', width: '100%', height: '50px', 
+                    borderRadius: '14px', border: '1px solid rgba(239, 68, 68, 0.4)', 
+                    background: 'rgba(239, 68, 68, 0.05)', color: '#ef4444', 
+                    fontWeight: 700, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem'
+                }}
+            >
+                <LogOut size={20} /> Logout Account
             </button>
 
             {/* Cropper Modal */}

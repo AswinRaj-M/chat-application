@@ -599,7 +599,9 @@ const Dashboard = () => {
             </AnimatePresence>
 
             {/* Premium Calling Overlay */}
-            <CallOverlay />
+            <AnimatePresence>
+                <CallOverlay />
+            </AnimatePresence>
         </motion.div>
     );
 };

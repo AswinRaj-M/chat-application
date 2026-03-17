@@ -644,9 +644,21 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4rem 2rem;
+  padding: clamp(1rem, 4vh, 3rem) 1.5rem;
   color: white;
   font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* Add custom icon class */
+.call-top-icon {
+  width: clamp(40px, 8vh, 60px);
+  height: clamp(40px, 8vh, 60px);
+  background: rgba(255,255,255,0.1);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .incoming-tag {
@@ -654,28 +666,28 @@ body {
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.2em;
-  margin-top: 1rem;
+  margin-top: 1vh;
   text-transform: uppercase;
 }
 
 .caller-name-lg {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 6vh, 2.5rem);
   font-weight: 800;
-  margin: 1.5rem 0 0.5rem 0;
+  margin: 1.5vh 0 0.5vh 0;
   text-align: center;
 }
 
 .caller-subtext {
   color: #94a3b8;
-  font-size: 1rem;
-  margin-bottom: 3rem;
+  font-size: 0.95rem;
+  margin-bottom: 2vh;
 }
 
 .profile-img-container {
   position: relative;
-  width: 220px;
-  height: 220px;
-  margin-bottom: 4rem;
+  width: clamp(130px, 25vh, 220px);
+  height: clamp(130px, 25vh, 220px);
+  margin-bottom: 2vh;
 }
 
 .profile-img-large {
@@ -708,25 +720,25 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.8rem 2rem;
+  padding: 0.7rem 1.8rem;
   border-radius: 40px;
   color: white;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
 }
 
-.glass-pill:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
 .call-actions-row {
   margin-top: auto;
   width: 100%;
+  max-width: 480px;
   display: flex;
   justify-content: space-around;
-  padding-bottom: 2rem;
+  padding-bottom: clamp(1rem, 4vh, 3rem);
+  gap: 1rem;
 }
+
 
 .call-action-btn {
   display: flex;
@@ -734,11 +746,12 @@ body {
   align-items: center;
   gap: 1rem;
   cursor: pointer;
+  flex: 1;
 }
 
 .circle-btn-lg {
-  width: 80px;
-  height: 80px;
+  width: clamp(70px, 10vw, 90px);
+  height: clamp(70px, 10vw, 90px);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -770,9 +783,9 @@ body {
 
 .duration-pill {
   background: rgba(0, 0, 0, 0.4);
-  padding: 0.4rem 1rem;
+  padding: 0.4rem 1.2rem;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -789,8 +802,8 @@ body {
 
 .active-profile-container {
   margin: auto 0;
-  width: 260px;
-  height: 260px;
+  width: clamp(200px, 40vh, 320px);
+  height: clamp(200px, 40vh, 320px);
 }
 
 .active-profile-img {
@@ -802,18 +815,17 @@ body {
 }
 
 .controls-glass-panel {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.5rem;
   border-radius: 35px;
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .control-item {
@@ -826,8 +838,8 @@ body {
 }
 
 .circle-btn-md {
-  width: 50px;
-  height: 50px;
+  width: clamp(45px, 6vw, 55px);
+  height: clamp(45px, 6vw, 55px);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   display: flex;
@@ -841,17 +853,21 @@ body {
   color: black;
 }
 
+.circle-btn-md:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .control-label {
-  font-size: 0.7rem;
-  color: #94a3b8;
+  font-size: 0.75rem;
+  color: #e2e8f0;
 }
 
 .end-call-pill {
   background: #ef4444;
   color: white;
   width: 100%;
-  max-width: 280px;
-  padding: 1.2rem;
+  max-width: 300px;
+  padding: 1.25rem;
   border-radius: 35px;
   border: none;
   font-weight: 700;
@@ -859,15 +875,20 @@ body {
   cursor: pointer;
   box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
   transition: all 0.2s;
+  margin-top: 1.5rem;
 }
 
-.end-call-pill:active { scale: 0.95; }
+.end-call-pill:active { transform: scale(0.95); }
 
 .video-modal-v2 {
   position: fixed;
   inset: 0;
   background: black;
   z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .remote-video-full {
@@ -878,14 +899,15 @@ body {
 
 .local-video-pip {
   position: absolute;
-  top: 4rem;
-  right: 1.5rem;
-  width: 120px;
-  height: 180px;
+  top: clamp(1rem, 5vh, 4rem);
+  right: clamp(1rem, 5vw, 2rem);
+  width: clamp(100px, 20vw, 160px);
+  height: clamp(150px, 30vw, 240px);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,255,255,0.2);
+  z-index: 4010;
 }
 
 

@@ -6,7 +6,8 @@ import { SocketContext } from '../context/SocketContext';
 const CallOverlay = () => {
     const {
         call, callAccepted, myVideo, userVideo,
-        stream, callEnded, leaveCall, rejectCall, toggleMute, isMuted, answerCall, getMedia
+        stream, callEnded, leaveCall, rejectCall, toggleMute, isMuted, answerCall, getMedia,
+        isCalling, me
     } = useContext(SocketContext);
 
     const [duration, setDuration] = useState(0);
@@ -36,10 +37,15 @@ const CallOverlay = () => {
         if (s) answerCall(s);
     };
 
-    if (callEnded || (!call.isReceivingCall && !callAccepted && !call.from)) return null;
+    // Use isCalling for more robust check
+    const isInitiator = isCalling && !callAccepted;
+    const isReceiver = call.isReceivingCall && !callAccepted;
+    const isActive = callAccepted && !callEnded;
+
+    if (callEnded || (!isInitiator && !isReceiver && !isActive)) return null;
 
     // 1. Incoming Call UI
-    if (call.isReceivingCall && !callAccepted) {
+    if (isReceiver) {
         return (
             <motion.div 
                 initial={{ opacity: 0 }}
@@ -47,8 +53,8 @@ const CallOverlay = () => {
                 exit={{ opacity: 0 }}
                 className="calling-screen"
             >
-                <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Phone size={32} color="#818cf8" />
+                <div className="call-top-icon">
+                    <Phone size={28} color="#818cf8" />
                 </div>
                 
                 <span className="incoming-tag">Incoming Call</span>
@@ -93,7 +99,7 @@ const CallOverlay = () => {
     }
 
     // 2. Active Call UI
-    if (callAccepted && !callEnded) {
+    if (isActive) {
         return (
             <motion.div 
                 initial={{ opacity: 0 }}
@@ -198,14 +204,17 @@ const CallOverlay = () => {
         );
     }
 
-    // Default return for cases like "Calling..." (where I am the initiator)
-    if (call.from === 'me' || (!call.isReceivingCall && call.userToCall)) {
+    // 3. Outgoing Call UI (Initiator)
+    if (isInitiator) {
         return (
             <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="calling-screen"
             >
+                <div className="call-top-icon" style={{ marginBottom: '1.5rem' }}>
+                    <Phone size={28} color="#818cf8" />
+                </div>
                 <div className="active-call-header">
                     <div className="duration-pill" style={{ background: 'rgba(255,255,255,0.1)' }}>
                         Calling...

@@ -516,7 +516,9 @@ const Message = () => {
             </AnimatePresence>
 
             {/* Premium Calling Overlay */}
-            <CallOverlay />
+            <AnimatePresence>
+                <CallOverlay />
+            </AnimatePresence>
         </motion.div>
     );
 };

@@ -50,11 +50,15 @@ const ContextProvider = ({ children }) => {
         });
 
         socket.on('incoming-call', ({ from, name: callerName, signal, callType }) => {
+            console.log('--- CALL INCOMING EVENT ---', { callerName, from, callType });
             // Busy check: If already in a call, auto-reject (or we could show "Call Waiting")
             if (isCalling || callAccepted) {
+                console.warn('Call auto-rejected: Already in another call.', { isCalling, callAccepted });
                 socket.emit('reject-call', { to: from });
                 return;
             }
+            console.log('Setting call state...');
+            setCallEnded(false);
             setCall({ isReceivingCall: true, from, name: callerName, signal, callType });
         });
 
@@ -164,6 +168,7 @@ const ContextProvider = ({ children }) => {
 
     const callUser = (id, currentStream, type = 'video', calleeName) => {
         setIsCalling(true);
+        setCallEnded(false);
         // Store call details locally: name should be the CALLEE's name for the caller's UI
         setCall({ isReceivingCall: false, from: me, name: calleeName, callType: type, userToCall: id });
 
@@ -210,6 +215,7 @@ const ContextProvider = ({ children }) => {
         socket.emit('reject-call', { to: call.from });
         setCall({});
         setIsCalling(false);
+        setCallEnded(false);
     };
 
     const toggleMute = () => {
@@ -230,8 +236,22 @@ const ContextProvider = ({ children }) => {
     };
 
     const leaveCall = () => {
+        // Capture targetId BEFORE clearing state
+        const targetId = isCalling ? call.userToCall : call.from;
+        console.log('--- LEAVE CALL (Clearing Signal) ---', { targetId, isCalling });
+
         setCallEnded(true);
-        if (connectionRef.current) connectionRef.current.destroy();
+        if (connectionRef.current) {
+            connectionRef.current.destroy();
+            connectionRef.current = null;
+        }
+
+        // Send end-call signal if possible
+        if (targetId) {
+            socket.emit('end-call', { to: targetId });
+        }
+
+        // Reset all states
         setCall({});
         setIsCalling(false);
         setCallAccepted(false);
@@ -240,12 +260,12 @@ const ContextProvider = ({ children }) => {
 
         // Stop all tracks to turn off camera light
         if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach(track => {
+                track.stop();
+                console.log('Track kind stopped:', track.kind);
+            });
             setStream(null);
         }
-
-        const targetId = isCalling ? call.userToCall : call.from;
-        if (targetId) socket.emit('end-call', { to: targetId });
     };
 
     // Get Media Stream
