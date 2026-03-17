@@ -519,6 +519,7 @@ body {
   .home-container, .dashboard-shell {
     flex-direction: column;
     padding: 0;
+    padding-bottom: 70px; /* Space for mobile nav */
     gap: 0;
     height: 100vh;
     overflow: hidden;
@@ -537,6 +538,7 @@ body {
     box-shadow: none;
     border: none;
     min-height: calc(100vh - 70px);
+    padding: 1rem;
   }
 
   .messages-area {
@@ -559,11 +561,22 @@ body {
   .chat-input-row {
     padding: 0.75rem 1rem;
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.75rem;
+  }
+  
+  .input-container {
+    padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .input-icons {
+    gap: 0.5rem;
   }
   
   .voice-btn {
     width: 44px;
     height: 44px;
+    flex-shrink: 0;
   }
 
   /* Force stack grids */
@@ -618,4 +631,261 @@ body {
     max-width: none;
   }
 }
+
+/* Calling UI Styles */
+.calling-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #000000 0%, #1e1b4b 50%, #000000 100%);
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+.incoming-tag {
+  color: #818cf8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  margin-top: 1rem;
+  text-transform: uppercase;
+}
+
+.caller-name-lg {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 1.5rem 0 0.5rem 0;
+  text-align: center;
+}
+
+.caller-subtext {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin-bottom: 3rem;
+}
+
+.profile-img-container {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin-bottom: 4rem;
+}
+
+.profile-img-large {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(129, 140, 248, 0.3);
+  box-shadow: 0 0 40px rgba(67, 56, 202, 0.4);
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #818cf8;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.8rem 2rem;
+  border-radius: 40px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.glass-pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.call-actions-row {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 2rem;
+}
+
+.call-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.circle-btn-lg {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: transform 0.2s;
+}
+
+.circle-btn-lg:active {
+  transform: scale(0.9);
+}
+
+.btn-decline { background: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+.btn-accept { background: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+
+.action-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* Active Call UI */
+.active-call-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.duration-pill {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot-green {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.active-profile-container {
+  margin: auto 0;
+  width: 260px;
+  height: 260px;
+}
+
+.active-profile-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
+  object-fit: cover;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.controls-glass-panel {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 35px;
+  width: 100%;
+  max-width: 320px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  cursor: pointer;
+}
+
+.circle-btn-md {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.circle-btn-md.active {
+  background: white;
+  color: black;
+}
+
+.control-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.end-call-pill {
+  background: #ef4444;
+  color: white;
+  width: 100%;
+  max-width: 280px;
+  padding: 1.2rem;
+  border-radius: 35px;
+  border: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+  transition: all 0.2s;
+}
+
+.end-call-pill:active { scale: 0.95; }
+
+.video-modal-v2 {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 4000;
+}
+
+.remote-video-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.local-video-pip {
+  position: absolute;
+  top: 4rem;
+  right: 1.5rem;
+  width: 120px;
+  height: 180px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
 

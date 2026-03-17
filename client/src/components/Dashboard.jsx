@@ -5,6 +5,7 @@ import Profile from './Profile';
 import NotificationView from './NotificationView';
 import DashboardHome from './DashboardHome';
 import FullProfileView from './FullProfileView';
+import CallOverlay from './CallOverlay';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { 
@@ -50,6 +51,13 @@ const Dashboard = () => {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [showEditProfile, setShowEditProfile] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     
     const scrollRef = useRef();
     const typingTimeoutRef = useRef(null);
@@ -417,7 +425,7 @@ const Dashboard = () => {
             {/* Main Content Area */}
             <div className={`main-viewport ${(mainView === 'chat' && !selectedUser) ? 'mobile-hide' : ''}`} style={{ 
                 flex: 1, 
-                padding: (mainView === 'home' || mainView === 'notifications') ? '0' : '1rem'
+                padding: (noContacts || isMobile) ? '0' : '1rem'
             }}>
                 <AnimatePresence mode="wait">
                     {mainView === 'home' && (
@@ -434,7 +442,7 @@ const Dashboard = () => {
                         >
                             {selectedUser ? (
                                 <div className="section-card" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}>
-                                    <div className="chat-header" style={{ padding: 'clamp(0.75rem, 2vh, 1.5rem)', borderBottom: '1px solid var(--bg-input)' }}>
+                                    <div className="chat-header" style={{ borderBottom: '1px solid var(--bg-input)' }}>
                                         <div className="header-user">
                                             <div className="mobile-only" onClick={() => setSelectedUser(null)} style={{ marginRight: '0.5rem', cursor: 'pointer' }}>
                                                 <ChevronLeft size={24} />
@@ -456,7 +464,7 @@ const Dashboard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="messages-area" style={{ flex: 1, padding: '1.5rem' }}>
+                                    <div className="messages-area" style={{ flex: 1 }}>
                                         {messages.map((m, i) => {
                                             const isMe = m.senderId === user.id;
                                             return (
@@ -481,7 +489,7 @@ const Dashboard = () => {
                                         <div ref={scrollRef} />
                                     </div>
 
-                                    <form onSubmit={handleSendMessage} className="chat-input-row" style={{ padding: '1.5rem' }}>
+                                    <form onSubmit={handleSendMessage} className="chat-input-row">
                                         <div className="input-container">
                                             <span style={{ cursor: 'pointer' }}><Paperclip size={20} /></span>
                                             <input type="text" placeholder="Type your message here..." value={newMessage} onChange={handleInputCheck} />
@@ -555,7 +563,7 @@ const Dashboard = () => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            style={{ padding: 'clamp(1rem, 5vw, 2rem)', height: '100%', overflowY: 'auto' }}
+                            style={{ padding: isMobile ? '0.5rem' : 'clamp(1rem, 5vw, 2rem)', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}
                         >
                             <div className="section-card" style={{ maxWidth: '800px', margin: '0 auto', width: '100%', height: 'auto', flex: 'none' }}>
                                 <Profile onClose={() => navigate('/profile')} />
@@ -590,37 +598,8 @@ const Dashboard = () => {
                 )}
             </AnimatePresence>
 
-            {/* Calling Overlays */}
-            <AnimatePresence>
-            {(call.isReceivingCall && !callAccepted) && (
-                <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }} style={{ position: 'fixed', top: '2rem', left: '50%', transform: 'translateX(-50%)', background: 'white', padding: '1.5rem 2rem', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)', zIndex: 3000, textAlign: 'center', border: '1px solid #f1f5f9' }}>
-                    <div style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Incoming Call</div>
-                    <h3>{call.name}</h3>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={handleAnswerCall} className="voice-btn" style={{ background: '#22c55e', width: 'auto', padding: '0 2rem', borderRadius: '12px' }}>Answer</button>
-                        <button onClick={rejectCall} className="voice-btn" style={{ background: '#ef4444', width: 'auto', padding: '0 2rem', borderRadius: '12px' }}>Reject</button>
-                    </div>
-                </motion.div>
-            )}
-            </AnimatePresence>
-
-            {/* Video Modal */}
-            {callAccepted && !callEnded && (
-                <div className="video-modal">
-                    <div className="video-grid">
-                        <div className="video-wrapper">
-                            <video playsInline muted ref={myVideo} autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                        <div className="video-wrapper">
-                            <video playsInline ref={userVideo} autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                    </div>
-                    <div style={{ position: 'absolute', bottom: '40px', display: 'flex', gap: '2rem' }}>
-                        <button onClick={toggleMute} className="voice-btn" style={{ background: isMuted ? '#ef4444' : 'var(--accent)' }}>{isMuted ? <Mic size={24} /> : <Mic size={24} />}</button>
-                        <button onClick={leaveCall} className="btn" style={{ background: '#ef4444', color: 'white', borderRadius: '30px', padding: '0.8rem 3rem', cursor: 'pointer' }}>End Call</button>
-                    </div>
-                </div>
-            )}
+            {/* Premium Calling Overlay */}
+            <CallOverlay />
         </motion.div>
     );
 };

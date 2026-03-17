@@ -137,9 +137,18 @@ router.get('/search', async (req, res) => {
 
 // Update Profile
 router.put('/profile', async (req, res) => {
-    const { userId, profileImage, coverImage, bio, location, age, qualification } = req.body;
+    const { userId, username, profileImage, coverImage, bio, location, age, qualification } = req.body;
     try {
         const updateData = {};
+        
+        if (username) {
+            const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Username already taken' });
+            }
+            updateData.username = username;
+        }
+
         if (profileImage !== undefined) updateData.profileImage = profileImage;
         if (coverImage !== undefined) updateData.coverImage = coverImage;
         if (bio !== undefined) updateData.bio = bio;

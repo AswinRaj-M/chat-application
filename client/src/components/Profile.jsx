@@ -11,6 +11,7 @@ const Profile = ({ onClose }) => {
     const { theme, toggleTheme } = useTheme();
     const [image, setImage] = useState(user?.profileImage || '');
     const [cover, setCover] = useState(user?.coverImage || '');
+    const [username, setUsername] = useState(user?.username || '');
     const [bio, setBio] = useState(user?.bio || '');
     const [location, setLocation] = useState(user?.location || '');
     const [age, setAge] = useState(user?.age || 18);
@@ -65,6 +66,7 @@ const Profile = ({ onClose }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     userId: user.id, 
+                    username,
                     profileImage: image, 
                     coverImage: cover,
                     bio, 
@@ -77,6 +79,7 @@ const Profile = ({ onClose }) => {
                 const updatedUser = await res.json();
                 loginUser({ 
                     ...user, 
+                    username: updatedUser.username,
                     profileImage: updatedUser.profileImage, 
                     coverImage: updatedUser.coverImage,
                     bio: updatedUser.bio,
@@ -86,10 +89,13 @@ const Profile = ({ onClose }) => {
                 });
                 toast.success('Settings updated successfully!');
                 if (onClose) onClose();
+            } else {
+                const errorData = await res.json();
+                toast.error(errorData.message || 'Failed to update settings');
             }
         } catch (err) {
             console.error(err);
-            toast.error('Failed to update settings');
+            toast.error('An error occurred while saving');
         } finally {
             setUploading(false);
         }
@@ -139,7 +145,7 @@ const Profile = ({ onClose }) => {
             </div>
             
             {/* Profile Avatar */}
-            <div style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ position: 'relative' }}>
                     <div style={{
                         width: '100px', height: '100px', borderRadius: '30px',
@@ -157,9 +163,17 @@ const Profile = ({ onClose }) => {
                         <input type="file" accept="image/*" onChange={(e) => handleImageChange(e, 'profile')} style={{ display: 'none' }} />
                     </label>
                 </div>
-                <div style={{ flex: '1', minWidth: '200px' }}>
-                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800 }}>{user?.username}</h3>
-                    <p style={{ margin: '4px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Choose a unique avatar and cover photo</p>
+                <div style={{ flex: '1', minWidth: '140px' }}>
+                    <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Username</label>
+                    <div className="search-container" style={{ padding: '0.6rem 1rem', background: 'var(--bg-app)' }}>
+                        <input 
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter username"
+                            style={{ background: 'transparent', border: 'none', width: '100%', outline: 'none', color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: 700 }}
+                        />
+                    </div>
                 </div>
             </div>
  

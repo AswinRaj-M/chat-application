@@ -62,9 +62,10 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                         <button 
                             onClick={onEdit}
                             style={{ 
-                                background: 'var(--bg-app)', border: 'none', padding: '10px 20px', 
-                                borderRadius: '12px', fontWeight: 700, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: '0.5rem'
+                                background: 'var(--accent)', border: 'none', padding: '10px 24px', 
+                                borderRadius: '14px', fontWeight: 800, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', gap: '0.6rem',
+                                color: 'white', boxShadow: '0 4px 15px rgba(67, 56, 202, 0.3)'
                             }}
                         >
                             <Edit3 size={18} /> Edit Profile

@@ -5,6 +5,7 @@ import Profile from './Profile';
 import NotificationView from './NotificationView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import CallOverlay from './CallOverlay';
 import { 
     Home as HomeIcon, 
     MessageSquare, 
@@ -514,37 +515,8 @@ const Message = () => {
                 )}
             </AnimatePresence>
 
-            {/* Calling Overlays */}
-            <AnimatePresence>
-            {(call.isReceivingCall && !callAccepted) && (
-                <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }} style={{ position: 'fixed', top: '2rem', left: '50%', transform: 'translateX(-50%)', background: 'white', padding: '1.5rem 2rem', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)', zIndex: 3000, textAlign: 'center', border: '1px solid #f1f5f9' }}>
-                    <div style={{ fontWeight: 800, marginBottom: '0.5rem' }}>Incoming Call</div>
-                    <h3>{call.name}</h3>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={handleAnswerCall} className="voice-btn" style={{ background: '#22c55e', width: 'auto', padding: '0 2rem', borderRadius: '12px' }}>Answer</button>
-                        <button onClick={rejectCall} className="voice-btn" style={{ background: '#ef4444', width: 'auto', padding: '0 2rem', borderRadius: '12px' }}>Reject</button>
-                    </div>
-                </motion.div>
-            )}
-            </AnimatePresence>
-
-            {/* Video Modal */}
-            {callAccepted && !callEnded && (
-                <div className="video-modal">
-                    <div className="video-grid">
-                        <div className="video-wrapper">
-                            <video playsInline muted ref={myVideo} autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                        <div className="video-wrapper">
-                            <video playsInline ref={userVideo} autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                    </div>
-                    <div style={{ position: 'absolute', bottom: '40px', display: 'flex', gap: '2rem' }}>
-                        <button onClick={toggleMute} className="voice-btn" style={{ background: isMuted ? '#ef4444' : 'var(--accent)' }}>{isMuted ? <Mic size={24} /> : <Mic size={24} />}</button>
-                        <button onClick={leaveCall} className="btn" style={{ background: '#ef4444', color: 'white', borderRadius: '30px', padding: '0.8rem 3rem', cursor: 'pointer' }}>End Call</button>
-                    </div>
-                </div>
-            )}
+            {/* Premium Calling Overlay */}
+            <CallOverlay />
         </motion.div>
     );
 };
