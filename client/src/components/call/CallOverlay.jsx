@@ -5,7 +5,7 @@ import { SocketContext } from '../../context/SocketContext';
 
 const CallOverlay = () => {
     const {
-        call, callAccepted, myVideo, userVideo,
+        call, callAccepted, myVideo, userVideo, stream,
         callEnded, leaveCall, rejectCall, toggleMute, isMuted, answerCall, getMedia,
         isCalling, remoteStream
     } = useContext(SocketContext);
@@ -13,6 +13,17 @@ const CallOverlay = () => {
     const [duration, setDuration] = useState(0);
     const [isSpeakerOn, setIsSpeakerOn] = useState(true);
     const audioRef = useRef(null);
+
+    const isInitiator = isCalling && !callAccepted;
+    const isReceiver = call.isReceivingCall && !callAccepted;
+    const isActive = callAccepted && !callEnded;
+
+    // Sync local video stream
+    useEffect(() => {
+        if (myVideo.current && stream) {
+            myVideo.current.srcObject = stream;
+        }
+    }, [stream, myVideo, isActive, isInitiator]);
 
     useEffect(() => {
         if (callAccepted && !callEnded && call.callType === 'audio' && remoteStream) {
@@ -52,9 +63,6 @@ const CallOverlay = () => {
         if (s) answerCall(s);
     };
 
-    const isInitiator = isCalling && !callAccepted;
-    const isReceiver = call.isReceivingCall && !callAccepted;
-    const isActive = callAccepted && !callEnded;
 
     if (callEnded || (!isInitiator && !isReceiver && !isActive)) return null;
 

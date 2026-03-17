@@ -5,11 +5,14 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
     plugins: [react()],
     define: {
-        global: 'window', // Fix for simple-peer
+        'global': 'window',
     },
     resolve: {
         alias: {
+            process: 'process/browser',
             util: 'util',
+            buffer: 'buffer',
+            stream: 'stream-browserify',
         },
     },
 })

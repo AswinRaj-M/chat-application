@@ -48,7 +48,7 @@ const Signup = () => {
     };
 
     return (
-        <div className="mobile-padding" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-app)', padding: '2rem 1rem' }}>
+        <div className="auth-page">
             <div className="section-card" style={{ padding: 'clamp(1.5rem, 5vw, 3rem)', width: '100%', maxWidth: '400px', flex: 'none', borderRadius: 'var(--radius-xl)' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <div style={{ background: 'var(--accent-light)', color: 'var(--accent)', width: '60px', height: '60px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
