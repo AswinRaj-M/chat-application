@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { SocketContext } from '../context/SocketContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { SocketContext } from '../../context/SocketContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
+import { fetchData } from '../../services/api';
 
 const Signup = () => {
     const { user } = useContext(SocketContext);
@@ -13,8 +14,7 @@ const Signup = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Redirect if already logged in
-    React.useEffect(() => {
+    useEffect(() => {
         if (user) {
             navigate('/message');
         }
@@ -31,27 +31,20 @@ const Signup = () => {
         }
 
         setLoading(true);
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username.trim(), password })
-            });
-            const data = await res.json();
+        const { ok, data } = await fetchData('/api/auth/signup', {
+            method: 'POST',
+            body: JSON.stringify({ username: username.trim(), password })
+        });
 
-            if (res.ok) {
-                setSuccess('Account created successfully! Redirecting to login...');
-                setTimeout(() => {
-                    navigate('/login');
-                }, 2000);
-            } else {
-                setError(data.message || 'Signup failed');
-            }
-        } catch (err) {
-            setError('Server error');
-        } finally {
-            setLoading(false);
+        if (ok) {
+            setSuccess('Account created successfully! Redirecting to login...');
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
+        } else {
+            setError(data.message || 'Signup failed');
         }
+        setLoading(false);
     };
 
     return (

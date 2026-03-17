@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { SocketContext } from '../context/SocketContext';
+import React, { useState, useContext, useEffect } from 'react';
+import { SocketContext } from '../../context/SocketContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
+import { fetchData } from '../../services/api';
 
 const Login = () => {
     const { loginUser, user } = useContext(SocketContext);
@@ -11,8 +12,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Redirect if already logged in
-    React.useEffect(() => {
+    useEffect(() => {
         if (user) {
             navigate('/message');
         }
@@ -22,25 +22,19 @@ const Login = () => {
         e.preventDefault();
         setLoading(true);
         setError('');
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username.trim(), password })
-            });
-            const data = await res.json();
+        
+        const { ok, data } = await fetchData('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ username: username.trim(), password })
+        });
 
-            if (res.ok) {
-                loginUser(data.user);
-                navigate('/message');
-            } else {
-                setError(data.message);
-            }
-        } catch (err) {
-            setError('Server error');
-        } finally {
-            setLoading(false);
+        if (ok) {
+            loginUser(data.user);
+            navigate('/message');
+        } else {
+            setError(data.message || 'Login failed');
         }
+        setLoading(false);
     };
 
     return (

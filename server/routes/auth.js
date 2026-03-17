@@ -1,170 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const authController = require('../controllers/authController');
 
 // Signup Route
-router.post('/signup', async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(400).json({ message: 'Username already exists' });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const newUser = new User({
-            username,
-            password: hashedPassword
-        });
-
-        await newUser.save();
-        res.status(201).json({ 
-            message: 'User created successfully', 
-            user: { 
-                id: newUser._id, 
-                username: newUser.username, 
-                profileImage: newUser.profileImage,
-                coverImage: newUser.coverImage,
-                bio: newUser.bio,
-                location: newUser.location
-            } 
-        });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
+router.post('/signup', authController.signup);
 
 // Login Route
-router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    console.log(`Login attempt for username: '${username}'`);
-    try {
-        const user = await User.findOne({ username });
-        if (!user) return res.status(404).json({ message: 'User not found' });
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-        // In a real app, generate JWT here
-        user.onlineStatus = true;
-        await user.save();
-
-        res.json({ 
-            user: { 
-                id: user._id, 
-                username: user.username, 
-                profileImage: user.profileImage,
-                coverImage: user.coverImage,
-                bio: user.bio,
-                location: user.location
-            } 
-        });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-
-
-// FORCE FIX ROUTE
-router.get('/fix-db', async (req, res) => {
-    try {
-        await User.deleteMany({}); // Delete ALL users
-        const password = process.env.PASSWORD || '71125';
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const sampleUsers = [
-            { username: 'vishnu', age: 24, qualification: 'Software Engineer', bio: 'Tech enthusiast and code lover 💻' },
-            { username: 'hima', age: 22, qualification: 'Medical Student', bio: 'Saving lives and enjoying coffee ☕' },
-            { username: 'kunjootan', age: 25, qualification: 'Architect', bio: 'Designing spaces and dreaming big 🏛️' },
-            { username: 'aswin', age: 23, qualification: 'Artist', bio: 'Expressing life through colors and brush 🎨' }
-        ];
-
-        for (const u of sampleUsers) {
-            const newUser = new User({
-                username: u.username,
-                password: hashedPassword,
-                onlineStatus: false,
-                age: u.age,
-                qualification: u.qualification,
-                bio: u.bio
-            });
-            await newUser.save();
-        }
-        res.json({ message: "Database FIXED. vishnuHima removed. vishnu and hima created." });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/login', authController.login);
 
 // Logout Route
-router.post('/logout', async (req, res) => {
-    const { userId } = req.body;
-    try {
-        await User.findByIdAndUpdate(userId, { onlineStatus: false });
-        res.json({ message: 'Logged out' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Get all users (for user list)
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.find({}, 'username onlineStatus');
-        res.json(users);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/logout', authController.logout);
 
 // Search Users
-router.get('/search', async (req, res) => {
-    const { username } = req.query;
-    try {
-        const users = await User.find({ 
-            username: { $regex: username, $options: 'i' } 
-        }, 'username onlineStatus profileImage');
-        res.json(users);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.get('/search', authController.searchUsers);
 
 // Update Profile
-router.put('/profile', async (req, res) => {
-    const { userId, username, profileImage, coverImage, bio, location, age, qualification } = req.body;
-    try {
-        const updateData = {};
-        
-        if (username) {
-            const existingUser = await User.findOne({ username, _id: { $ne: userId } });
-            if (existingUser) {
-                return res.status(400).json({ message: 'Username already taken' });
-            }
-            updateData.username = username;
-        }
-
-        if (profileImage !== undefined) updateData.profileImage = profileImage;
-        if (coverImage !== undefined) updateData.coverImage = coverImage;
-        if (bio !== undefined) updateData.bio = bio;
-        if (location !== undefined) updateData.location = location;
-        if (age !== undefined) updateData.age = age;
-        if (qualification !== undefined) updateData.qualification = qualification;
-
-        const user = await User.findByIdAndUpdate(
-            userId, 
-            updateData, 
-            { new: true }
-        ).select('-password');
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.put('/profile', authController.updateProfile);
 
 module.exports = router;

@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react';
-import { SocketContext } from '../context/SocketContext';
-import { useTheme } from '../context/ThemeContext';
-import { User, X, Camera, MapPin, AlignLeft, Moon, Sun, Check, Scissors, LogOut } from 'lucide-react';
+import { SocketContext } from '../../context/SocketContext';
+import { useTheme } from '../../context/ThemeContext';
+import { User, X, Camera, MapPin, AlignLeft, Moon, Sun, Check, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import Cropper from 'react-easy-crop';
-import { getCroppedImg } from '../utils/cropImage';
+import { getCroppedImg } from '../../utils/cropImage';
+import { fetchData } from '../../services/api';
 
-const Profile = ({ onClose }) => {
+const ProfileSettings = ({ onClose }) => {
     const { user, loginUser, logoutUser } = useContext(SocketContext);
     const { theme, toggleTheme } = useTheme();
     const [image, setImage] = useState(user?.profileImage || '');
@@ -60,45 +61,37 @@ const Profile = ({ onClose }) => {
 
     const handleSave = async () => {
         setUploading(true);
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/profile`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    userId: user.id, 
-                    username,
-                    profileImage: image, 
-                    coverImage: cover,
-                    bio, 
-                    location,
-                    age,
-                    qualification
-                })
+        const { ok, data } = await fetchData('/api/auth/profile', {
+            method: 'PUT',
+            body: JSON.stringify({ 
+                userId: user.id, 
+                username,
+                profileImage: image, 
+                coverImage: cover,
+                bio, 
+                location,
+                age,
+                qualification
+            })
+        });
+
+        if (ok) {
+            loginUser({ 
+                ...user, 
+                username: data.username,
+                profileImage: data.profileImage, 
+                coverImage: data.coverImage,
+                bio: data.bio,
+                location: data.location,
+                age: data.age,
+                qualification: data.qualification
             });
-            if (res.ok) {
-                const updatedUser = await res.json();
-                loginUser({ 
-                    ...user, 
-                    username: updatedUser.username,
-                    profileImage: updatedUser.profileImage, 
-                    coverImage: updatedUser.coverImage,
-                    bio: updatedUser.bio,
-                    location: updatedUser.location,
-                    age: updatedUser.age,
-                    qualification: updatedUser.qualification
-                });
-                toast.success('Settings updated successfully!');
-                if (onClose) onClose();
-            } else {
-                const errorData = await res.json();
-                toast.error(errorData.message || 'Failed to update settings');
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error('An error occurred while saving');
-        } finally {
-            setUploading(false);
+            toast.success('Settings updated successfully!');
+            if (onClose) onClose();
+        } else {
+            toast.error(data.message || 'Failed to update settings');
         }
+        setUploading(false);
     };
 
     return (
@@ -340,4 +333,4 @@ const Profile = ({ onClose }) => {
     );
 };
 
-export default Profile;
+export default ProfileSettings;

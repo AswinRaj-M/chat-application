@@ -7,4 +7,9 @@ export default defineConfig({
     define: {
         global: 'window', // Fix for simple-peer
     },
+    resolve: {
+        alias: {
+            util: 'util',
+        },
+    },
 })

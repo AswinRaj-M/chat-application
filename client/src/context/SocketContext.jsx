@@ -16,9 +16,11 @@ const ContextProvider = ({ children }) => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
     const [onlineUsers, setOnlineUsers] = useState([]);
+    const [notifications, setNotifications] = useState([]);
 
     const [isMuted, setIsMuted] = useState(false);
     const [remoteMuted, setRemoteMuted] = useState(false);
+    const [remoteStream, setRemoteStream] = useState(null);
 
     // Call State
     const [call, setCall] = useState({});
@@ -90,6 +92,34 @@ const ContextProvider = ({ children }) => {
         socket.on('call-ended', () => {
             leaveCall();
         });
+        
+        socket.on('friend-request-received', ({ requesterName }) => {
+            setNotifications(prev => [
+                { 
+                    id: Date.now(), 
+                    type: 'request', 
+                    title: 'New Friend Request', 
+                    message: `${requesterName} wants to connect with you.`, 
+                    time: 'Just now', 
+                    read: false 
+                },
+                ...prev
+            ]);
+        });
+
+        socket.on('friend-request-accepted', ({ acceptorName }) => {
+            setNotifications(prev => [
+                { 
+                    id: Date.now(), 
+                    type: 'request', 
+                    title: 'Request Accepted', 
+                    message: `${acceptorName} accepted your friend request!`, 
+                    time: 'Just now', 
+                    read: false 
+                },
+                ...prev
+            ]);
+        });
 
         return () => {
             socket.off('connect', handleConnect);
@@ -97,8 +127,10 @@ const ContextProvider = ({ children }) => {
             socket.off('incoming-call');
             socket.off('call-rejected');
             socket.off('peer-mute-status');
-            socket.off('call-accepted'); // Added cleanup for call-accepted
+            socket.off('call-accepted');
             socket.off('call-ended');
+            socket.off('friend-request-received');
+            socket.off('friend-request-accepted');
         };
 
     }, [user, isCalling, callAccepted]); // Added dependencies for busy check
@@ -158,6 +190,7 @@ const ContextProvider = ({ children }) => {
 
         peer.on('stream', (currentStream) => {
             console.log('Received remote stream (answer side)');
+            setRemoteStream(currentStream);
             if (userVideo.current) userVideo.current.srcObject = currentStream;
         });
 
@@ -203,6 +236,7 @@ const ContextProvider = ({ children }) => {
 
         peer.on('stream', (currentStream) => {
             console.log('Received remote stream (caller side)');
+            setRemoteStream(currentStream);
             if (userVideo.current) userVideo.current.srcObject = currentStream;
         });
 
@@ -216,6 +250,7 @@ const ContextProvider = ({ children }) => {
         setCall({});
         setIsCalling(false);
         setCallEnded(false);
+        setRemoteStream(null);
     };
 
     const toggleMute = () => {
@@ -257,6 +292,7 @@ const ContextProvider = ({ children }) => {
         setCallAccepted(false);
         setIsMuted(false);
         setRemoteMuted(false);
+        setRemoteStream(null);
 
         // Stop all tracks to turn off camera light
         if (stream) {
@@ -300,13 +336,16 @@ const ContextProvider = ({ children }) => {
             toggleMute,
             isMuted,
             remoteMuted,
+            remoteStream,
             answerCall,
             getMedia,
             user,
             loginUser,
             logoutUser,
             socket,
-            isCalling
+            isCalling,
+            notifications,
+            setNotifications
         }}>
             {children}
         </SocketContext.Provider>

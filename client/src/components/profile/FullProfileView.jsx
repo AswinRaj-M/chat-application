@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { SocketContext } from '../context/SocketContext';
+import React, { useContext } from 'react';
+import { SocketContext } from '../../context/SocketContext';
 import { motion } from 'framer-motion';
 import { 
     User, 
@@ -7,15 +7,14 @@ import {
     Edit3, 
     Users, 
     MapPin, 
-    Link as LinkIcon, 
     Calendar,
     MessageCircle,
-    Check,
     LogOut
 } from 'lucide-react';
 
 const FullProfileView = ({ user, friends = [], onEdit }) => {
     const { logoutUser } = useContext(SocketContext);
+    
     return (
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -51,10 +50,10 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                             <img 
                                 src={user.profileImage} 
                                 style={{ width: '120px', height: '120px', borderRadius: '30px', border: '5px solid var(--bg-card)', objectFit: 'cover', background: 'var(--bg-card)' }} 
-                                className="profile-avatar-img"
+                                className="avatar"
                             />
                         ) : (
-                            <div style={{ width: '120px', height: '120px', borderRadius: '30px', border: '5px solid var(--bg-card)', background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }} className="profile-avatar-img">
+                            <div style={{ width: '120px', height: '120px', borderRadius: '30px', border: '5px solid var(--bg-card)', background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }} className="avatar">
                                 <User size={60} />
                             </div>
                         )}
@@ -95,7 +94,7 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <MapPin size={16} /> {user?.location || 'Everywhere'}
                     </div>
@@ -125,7 +124,7 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                         <div className="section-title">Connections ({friends.length})</div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                             {friends.slice(0, 6).map(friend => (
-                                <div key={friend._id} style={{ textAlign: 'center' }}>
+                                <div key={friend._id || friend.id} style={{ textAlign: 'center' }}>
                                     {friend.profileImage ? (
                                         <img src={friend.profileImage} style={{ width: '100%', aspectRatio: '1/1', borderRadius: '12px', objectFit: 'cover' }} />
                                     ) : (
@@ -139,11 +138,6 @@ const FullProfileView = ({ user, friends = [], onEdit }) => {
                                 </div>
                             ))}
                         </div>
-                        {friends.length > 6 && (
-                            <button style={{ width: '100%', background: 'none', border: '1px solid var(--bg-input)', color: 'var(--text-main)', padding: '10px', borderRadius: '12px', marginTop: '1rem', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}>
-                                View all
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>

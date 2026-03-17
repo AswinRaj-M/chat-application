@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, Heart, UserPlus, MessageSquare, Trash2, CheckCircle2 } from 'lucide-react';
+import { Bell, UserPlus, MessageSquare, Trash2, CheckCircle2 } from 'lucide-react';
 
 const NotificationView = ({ notifications, onClearOne, onClearAll, onMarkAsRead }) => {
     const [activeTab, setActiveTab] = useState('unread');

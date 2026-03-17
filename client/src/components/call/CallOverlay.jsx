@@ -1,17 +1,32 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Volume2, UserPlus, MessageSquare, X } from 'lucide-react';
-import { SocketContext } from '../context/SocketContext';
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Phone, PhoneOff, Mic, MicOff, Video, Volume2, UserPlus, MessageSquare } from 'lucide-react';
+import { SocketContext } from '../../context/SocketContext';
 
 const CallOverlay = () => {
     const {
         call, callAccepted, myVideo, userVideo,
-        stream, callEnded, leaveCall, rejectCall, toggleMute, isMuted, answerCall, getMedia,
-        isCalling, me
+        callEnded, leaveCall, rejectCall, toggleMute, isMuted, answerCall, getMedia,
+        isCalling, remoteStream
     } = useContext(SocketContext);
 
     const [duration, setDuration] = useState(0);
     const [isSpeakerOn, setIsSpeakerOn] = useState(true);
+    const audioRef = useRef(null);
+
+    useEffect(() => {
+        if (callAccepted && !callEnded && call.callType === 'audio' && remoteStream) {
+            if (audioRef.current) {
+                audioRef.current.srcObject = remoteStream;
+            }
+        }
+    }, [callAccepted, callEnded, call.callType, remoteStream]);
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = !isSpeakerOn;
+        }
+    }, [isSpeakerOn]);
 
     useEffect(() => {
         let timer;
@@ -37,7 +52,6 @@ const CallOverlay = () => {
         if (s) answerCall(s);
     };
 
-    // Use isCalling for more robust check
     const isInitiator = isCalling && !callAccepted;
     const isReceiver = call.isReceivingCall && !callAccepted;
     const isActive = callAccepted && !callEnded;
@@ -82,7 +96,7 @@ const CallOverlay = () => {
                 <div className="call-actions-row">
                     <div className="call-action-btn" onClick={rejectCall}>
                         <div className="circle-btn-lg btn-decline">
-                            <PhoneOff size={32} style={{ transform: 'rotate(0deg)' }} />
+                            <PhoneOff size={32} />
                         </div>
                         <span className="action-label">Decline</span>
                     </div>
@@ -113,7 +127,6 @@ const CallOverlay = () => {
                             <video playsInline muted ref={myVideo} autoPlay style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
                         
-                        {/* Overlay controls on video */}
                         <div style={{ position: 'absolute', bottom: '4rem', left: '50%', transform: 'translateX(-50%)', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', padding: '0 2rem' }}>
                             <div className="controls-glass-panel">
                                 <div className="control-item" onClick={toggleMute}>
@@ -198,13 +211,15 @@ const CallOverlay = () => {
                                 End Call
                             </button>
                         </div>
+
+                        <audio ref={audioRef} autoPlay playsInline />
                     </>
                 )}
             </motion.div>
         );
     }
 
-    // 3. Outgoing Call UI (Initiator)
+    // 3. Outgoing Call UI
     if (isInitiator) {
         return (
             <motion.div 
